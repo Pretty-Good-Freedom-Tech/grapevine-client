@@ -2,8 +2,8 @@
 
 A Nostr web client for the My Grapevine web of trust recommendation engine. Provides viewing and management of WoT recommendations and subscriptions for end users.
 
-preview : not available
-production : [grapevine.my](https://grapevine.my)
+- preview : not available
+- production : [grapevine.my](https://grapevine.my)
 
 
 ## Developing
