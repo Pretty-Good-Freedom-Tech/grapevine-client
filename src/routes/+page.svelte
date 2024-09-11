@@ -2,6 +2,7 @@
 	import GrapevineStats from "$lib/components/grapevine-stats.svelte";
 
 </script>
+
 <div class="p-5 bg-neutral flex">
   <div class="text-6xl pr-3">🍇</div>
   <div>
@@ -11,7 +12,7 @@
 </div>
 
 
-<div class="card p-5">
+<div class="p-5">
   
   <div class="chat chat-start">
     <div class="chat-image avatar">
