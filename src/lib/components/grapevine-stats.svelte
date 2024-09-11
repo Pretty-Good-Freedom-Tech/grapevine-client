@@ -80,7 +80,7 @@
     <td>
       <div class="flex items-center gap-3">
         <div class="avatar">
-          <div class="mask mask-circle w-12">
+          <div class="rounded-full w-12 ring-2 ring-info ring-offset-4 ring-offset-purple-900">
             <img src={author.profile?.image || defaultAvatarUrl} alt="avatar" />
           </div>
         </div> 

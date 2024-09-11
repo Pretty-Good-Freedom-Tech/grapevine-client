@@ -12,10 +12,10 @@ export default {
         {
         grapevine: {
           ...require("daisyui/src/theming/themes")["forest"],
-          info: "#c084fc",
-          success: "#e879f9",
-          warning : "#f472b6",
-          error : "#fb7185"
+          info: "#a855f7",
+          success: "#d946ef",
+          warning : "#ec4899",
+          error : "#f43f5e"
         }
       }
     ],
