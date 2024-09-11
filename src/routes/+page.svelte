@@ -23,7 +23,7 @@
       </div>
     </div>
     <div class="chat-bubble">My Grapevine feeds are free from bots and bad actors while still including new and interesting accounts to follow.</div>
-    <div class="chat-footer opacity-50">@ManiMe</div>
+    <div class="chat-footer">@ManiMe <i class="opacity-50">- Client Dev</i></div>
 </div>
 
 <div class="chat chat-end">
@@ -35,7 +35,7 @@
     </div>
   </div>
   <div class="chat-bubble">Our opensource <a class="text-success underline" target="_blank" href="https://habla.news/a/naddr1qqxnzdes8q6rwv3hxs6rjvpeqgs98k45ww24g26dl8yatvefx3qrkaglp2yzu6dm3hv2vcxl822lqtgrqsqqqa28kn8wur">GrapeRank</a> algo (similar to Google PageRank) ingests ALL follows, mutes, and reports (soon zaps and other stuff also) from across Nostr to generate YOUR personalized Grapevine feeds. Web of Trust is only the begining.</div>
-  <div class="chat-footer opacity-50">@Straycat</div>
+  <div class="chat-footer">@Straycat <i class="opacity-50">- Project Lead</i></div>
 </div>
 
 <div class="chat chat-start">
@@ -47,7 +47,7 @@
     </div>
   </div>
   <div class="chat-bubble">Imagine <a class="text-success underline" target="_blank" href="https://nostr1.com">Nostr1</a> powered by My Grapevine, where anyone can instantly deploy their own WoT relay! Nostr is gonna love this!!</div>
-  <div class="chat-footer opacity-50">@cloudfodder</div>
+  <div class="chat-footer">@cloudfodder <i class="opacity-50">- Relay Dev</i></div>
 </div>
 </div>
 
