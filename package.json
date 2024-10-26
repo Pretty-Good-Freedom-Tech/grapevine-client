@@ -30,7 +30,7 @@
 		"postcss": "^8.4.45",
 		"prettier": "^3.1.1",
 		"prettier-plugin-svelte": "^3.1.2",
-		"svelte": "^4.2.7",
+		"svelte": "^4.2.19",
 		"svelte-check": "^3.6.0",
 		"tailwindcss": "^3.4.10",
 		"typescript": "^5.0.0",
@@ -39,6 +39,7 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"@nostr-dev-kit/ndk": "^2.10.0"
+		"@nostr-dev-kit/ndk": "^2.10.0",
+		"graperank-nodejs": "https://github.com/Pretty-Good-Freedom-Tech/graperank-nodejs.git"
 	}
 }

@@ -1,15 +1,10 @@
-<script>
+<script lang="ts">
+	import { goto } from "$app/navigation";
 	import GrapevineStats from "$lib/components/grapevine-stats.svelte";
 
-</script>
+  let observer : string = ""
 
-<div class="p-5 bg-neutral flex">
-  <div class="text-6xl pr-3">🍇</div>
-  <div>
-    <h1 class="text-success text-4xl">My Grapevine</h1>
-    <p class="text-primary text-xl">Smarter Webs of Trust for Nostr</p>
-  </div>
-</div>
+</script>
 
 
 <div class="p-5">
@@ -18,7 +13,7 @@
     <div class="chat-image avatar">
       <div class="w-12 rounded-full ring-2 ring-info ring-offset-4 ring-offset-purple-900">
         <img
-          alt="Tailwind CSS chat bubble component"
+          alt="ManiMe"
           src="https://primal.b-cdn.net/media-cache?s=s&a=1&u=https%3A%2F%2Fprofilepics.nostur.com%2Fprofilepic_v1%2Fad749c9c22f8e74d5b2311b1069b771acd1249674f0ee57ed6de6f360ed654b8%2Fprofilepic.jpg%3F1709785889" />
       </div>
     </div>
@@ -30,7 +25,7 @@
   <div class="chat-image avatar">
     <div class="w-12 rounded-full ring-2 ring-info ring-offset-4 ring-offset-purple-900">
       <img
-        alt="Tailwind CSS chat bubble component"
+        alt="Straycat"
         src="https://primal.b-cdn.net/media-cache?s=s&a=1&u=https%3A%2F%2Fpbs.twimg.com%2Fprofile_images%2F1402348796105875460%2F3pXzX7SL_400x400.jpg" />
     </div>
   </div>
@@ -42,7 +37,7 @@
   <div class="chat-image avatar">
     <div class="w-12 rounded-full ring-2 ring-info ring-offset-4 ring-offset-purple-900">
       <img
-        alt="Tailwind CSS chat bubble component"
+        alt="Cloudfodder"
         src="https://primal.b-cdn.net/media-cache?s=s&a=1&u=https%3A%2F%2Frogue.earth%2F.well-known%2Fth3administrator1.jpg" />
     </div>
   </div>
@@ -62,6 +57,11 @@
     <p><b>My Grapevine Reccomended List</b> <br> Discover interesting Nostriches from your follows follows.</p>
     <div class="card-actions justify-start">
       <a class="btn btn-info text-xl text-base-100" target="_blank" href="https://brainstorm.ninja/#/grapevine/actions/export">Go To Grapevine List Builder</a>
+    </div>
+
+    <div class="join">
+      <input bind:value={observer} class="input join-item border-info" placeholder="paste your npub" type="text" />
+      <button class="btn join-item btn-info text-xl" on:click={()=>goto('/demo/'+observer)}>Demo</button>
     </div>
   </div>
 </div>
