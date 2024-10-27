@@ -8,17 +8,18 @@
   import type { Scorecard } from "graperank-nodejs/src/types";
 	import { onMount } from "svelte";
 
-	export let data;
+	// export let data;
 
   const defaultAvatarUrl = "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
 
   let scorecardspromise : Promise<Scorecard[] | undefined>
   let profilepromise : Promise<NDKUserProfile | null>
-  let scorecards : Scorecard[] = []
-  let topscorecards : Scorecard[] 
-  $: topscorecards= []
-  let bottomscorecards : Scorecard[] 
-  $: bottomscorecards = []
+  let scorecards : Scorecard[][] 
+  $: scorecards = []
+  // let topscorecards : Scorecard[] 
+  // $: topscorecards= []
+  // let bottomscorecards : Scorecard[] 
+  // $: bottomscorecards = []
   // let grouped : Scorecard[][] | undefined
   // $: grouped = undefined
   // let groupincrement : number = 1
@@ -26,6 +27,10 @@
   // $: groupselect = 0
   let numcards : number
   $: numcards = 0
+  let cardsMB : number
+  $: cardsMB = 0
+  let calculationtime : number
+  $: calculationtime = 0
   let demouser : NDKUser | undefined
   $: demouser = $ndk.activeUser
   onMount(async ()=>{
@@ -49,24 +54,30 @@
 
  async function calculateScorecards(){
   if(!demouser) return false
+  calculationtime = Date.now()
   scorecardspromise = getScorecards(demouser.pubkey, DEMO_CONTEXT)
-  await scorecardspromise.then((scorecards)=>{
-    scorecards = scorecards
-    topscorecards = scorecardsByScore(99, 100)
-    bottomscorecards = scorecardsByScore(0, .1)
+  scorecardspromise.then((cards)=>{
+    if(cards){
+      numcards = cards.length
+      cardsMB = new TextEncoder().encode(JSON.stringify(cards)).length  / 1024 / 1024;
+      scorecards = groupScorecardsByScore(cards,.1)
+      calculationtime = (Date.now() - calculationtime) * .001
+    }
+    // topscorecards = scorecardsByScore(99, 100)
+    // bottomscorecards = scorecardsByScore(0, .1)
   })
   return true
 }
 
- function scorecardsByScore(min = 0, max = 1){
-  return scorecards.filter((card)=>{
-    let match = true
-    if(!card.score) return false
-    if(card.score < min) match = false
-    if(card.score > max) match = false
-    return match
-  })
- }
+//  function scorecardsByScore(min = 0, max = 1){
+//   return scorecards.filter((card)=>{
+//     let match = true
+//     if(!card.score) return false
+//     if(card.score < min) match = false
+//     if(card.score > max) match = false
+//     return match
+//   })
+//  }
 </script>
 
 <section class="p-5">
@@ -107,17 +118,40 @@
     Calculating GrapeRank Scores for your network <br>
     (This may take a minute <span class="loading loading-dots loading-sm"></span>)
   </p>
+
   {:then}
+  {#if scorecards}
+  <p class="text-xl">GrapeRank found {numcards || 0} people in your network.</p>
+  <p class="text-sm opacity-50">The calculation took {Math.round(calculationtime)} seconds and produced {cardsMB.toPrecision(4)}MB of data.</p>
 
-  <p class="text-xl">GrapeRank found {scorecards?.length || 0} people in your network.</p>
-  <br>
-  {#if topscorecards}
-    <p>Here are the top {topscorecards.length} trusted users in your network :</p>
-    {#each topscorecards as scorecard }
-      <ScorecardView scorecard={scorecard}/>
+  <div class="p-5 gap-3">
+    {#each scorecards as scoregroup, index}
+    <div>
+      <progress class="progress progress-primary w-full" value={(scoregroup.length / numcards ) * 100} max={25}></progress>
+      <p class="text-sm opacity-80">{scoregroup.length} people scored {((scorecards.length - index -1) * .1).toPrecision(2)}</p>
+    </div>
     {/each}
-  {/if}
+  </div>
+  <br>
 
+
+  <!-- <div role="tablist" class="tabs tabs-bordered">
+    <input type="radio" name="my_tabs_2" role="tab" class="tab" aria-label="Top Scores" checked/>
+    <div role="tabpanel" class="tab-content bg-base-100 border-base-300 rounded-box p-6">
+      <p>Here are the top {scorecards[0]?.length} trusted users in your network :</p>
+      {#each scorecards[0] as scorecard }
+        <ScorecardView scorecard={scorecard}/>
+      {/each}
+    </div>
+    <input type="radio" name="my_tabs_2" role="tab" class="tab" aria-label="Bottom Scores" />
+    <div role="tabpanel" class="tab-content bg-base-100 border-base-300 rounded-box p-6">
+      <p>Here are the bottom {scorecards?.length} possibly untrustworthy users in your network :</p>
+      {#each scorecards[4] as scorecard }
+        <ScorecardView scorecard={scorecard}/>
+      {/each}
+    </div>
+  </div> -->
+    {/if}
   {/await}
   {/if}
 
