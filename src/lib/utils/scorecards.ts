@@ -1,58 +1,47 @@
-import { browser } from "$app/environment";
-import type { Scorecard } from "graperank-nodejs/src/types";
+import type { Scorecard, ScorecardsDataStorage } from "graperank-nodejs/src/types";
 
-export async function getScorecards(pubkey : string, context? : string) : Promise<Scorecard[] | undefined>{
+export async function fetchScorecards(pubkey : string, context? : string) : Promise<Scorecard[] | undefined>{
   console.log('grapevine getScorecards() params : ',pubkey,context)
-  let scorecards : Scorecard[] | undefined = undefined
+  let scorecards : Scorecard[] = []
   let address = context ? pubkey+'/'+context : pubkey
-  // let localstorage : string | null = null
-  // if(browser) localstorage = window.localStorage.getItem(address);
-  // if(localstorage) {
-  //   console.log('grapevine getScorecards() : retrieved from localstorage')
-  //   return JSON.parse(localstorage) as Scorecard[]
-  // }
-  scorecards = await fetch('/api/get/scorecards/'+address)
-    .then(r => {
+  await fetch('/api/get/scorecards/'+address)
+    .then(async r => {
       console.log('grapevine getScorecards() : fetched from api')
-      return r.json()
+      let data = await r.json() as ScorecardsDataStorage
+      if(data) data.forEach((entry)=>{
+        scorecards.push({  subject : entry[0],  ...entry[1]  })
+      })
     }).catch((e) => {
-      console.log('grapevine getScorecards() : fetch from api failed : ',e)
+      console.log('GrapeVine : getScorecards() : fetch from api failed : ',e)
     })
-  // if(browser && !!scorecards) {
-  //   localstorage = JSON.stringify(scorecards)
-  //   console.log('grapevine getScorecards() : sending ',localstorage.length,' bytes to localstorage...')
-  //   try{
-  //     window.localStorage.setItem(address, localstorage)
-  //   }catch(e){
-  //     console.log('grapevine getScorecards() : localstorage failed :', e)
-  //   }
-  // };
-  return scorecards
+    return scorecards
 }
 
 
-export function groupScorecardsByScore(scorecards : Scorecard[], increment = .2){
-  const grouped : Scorecard[][] = []
-  let g = 0
-  while(g < 1){
-    grouped.unshift(scorecards.filter((scorecard)=>{
-      if(scorecard.score == undefined) return false
-      let match = false
-      if(scorecard.score >= g) match = true
-      if(scorecard.score > g + increment) match = false
-      return match
-    }))
-    g = g + increment
+export function countScorecardsByScore(scorecards : Scorecard[], increment = .1, max = 1) : {min:number, max:number, count:number}[] {
+  const count : {min:number, max:number, count:number}[] = []
+  let min = max
+  while(min > 0){
+    min = min - increment
+    console.log('GrapeVine : calling filterScorecardsByScore() : called with min/max : ',min, max, scorecards.length)
+    let filtered = filterScorecardsByScore(scorecards, min, max)
+    if(filtered.length)
+    count.push({
+      min, max,
+      count : filtered.length
+    })
+    max = min
   }
-  return grouped
+  return count
 }
 
-// export function filterScorecardsByScore(scorecards : Scorecard[], min :number, max :number) : Scorecard[]{
-//   const filtered : Scorecard[] = []
-//   for(let c in scorecards){
-//     if(!!scorecards[c] && scorecards[c].score)
-//     if(scorecards[c].score >= min && scorecards[c].score < max ) 
-//     filtered.push(scorecards[c])
-//   }
-//   return filtered
-// }
+export function filterScorecardsByScore(scorecards : Scorecard[], min : number, max :number, slice? : [number, number]) : Scorecard[]{
+  const filtered = scorecards.filter((scorecard)=>{
+    if(scorecard.score == undefined) return false
+    let match = false
+    if(scorecard.score >= min) match = true
+    if(scorecard.score > max) match = false
+    return match
+  })
+  return slice ? filtered.slice(...slice) : filtered
+}

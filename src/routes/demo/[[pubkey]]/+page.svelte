@@ -2,8 +2,7 @@
 <script lang="ts">
 	import ScorecardView from "$lib/components/scorecard-view.svelte";
 	import { ndk } from "$lib/stores/ndk.store";
-	import { DEMO_CONTEXT } from "$lib/utils/const";
-	import { getScorecards, groupScorecardsByScore } from "$lib/utils/scorecards";
+	import { countScorecardsByScore, fetchScorecards, filterScorecardsByScore } from "$lib/utils/scorecards";
   import NDK, { NDKNip07Signer , NDKUser, type NDKUserProfile} from "@nostr-dev-kit/ndk";
   import type { Scorecard } from "graperank-nodejs/src/types";
 	import { onMount } from "svelte";
@@ -14,8 +13,10 @@
 
   let scorecardspromise : Promise<Scorecard[] | undefined>
   let profilepromise : Promise<NDKUserProfile | null>
-  let scorecards : Scorecard[][] 
+  let scorecards : Scorecard[]
   $: scorecards = []
+  let filteredcards : Scorecard[]
+  $: filteredcards = []
   // let topscorecards : Scorecard[] 
   // $: topscorecards= []
   // let bottomscorecards : Scorecard[] 
@@ -55,12 +56,13 @@
  async function calculateScorecards(){
   if(!demouser) return false
   calculationtime = Date.now()
-  scorecardspromise = getScorecards(demouser.pubkey, DEMO_CONTEXT)
-  scorecardspromise.then((cards)=>{
-    if(cards){
-      numcards = cards.length
-      cardsMB = new TextEncoder().encode(JSON.stringify(cards)).length  / 1024 / 1024;
-      scorecards = groupScorecardsByScore(cards,.1)
+  scorecardspromise = fetchScorecards(demouser.pubkey)
+  scorecardspromise.then((scorecardstorage)=>{
+    if(scorecardstorage){
+      scorecards = scorecardstorage
+      numcards = scorecards.length
+      cardsMB = new TextEncoder().encode(JSON.stringify(scorecards)).length  / 1024 / 1024;
+      // scorecards = groupScorecardsByScore(scorecardstorage,.1)
       calculationtime = (Date.now() - calculationtime) * .001
     }
     // topscorecards = scorecardsByScore(99, 100)
@@ -81,17 +83,17 @@
 </script>
 
 <section class="p-5">
-  <h2 class="text-2xl">Demo : GrapeVine Web of Trust</h2>
-  <hr class="p-3">
-  {#if !$ndk.activeUser}
-  Login with Nostr extention to launch the demo <br><br>
+  <h2 class="badge badge-primary badge-lg">DEMO</h2>
+
+  {#if !demouser}
+  <p class="text-lg p-5">Login with Nostr extention to launch the demo </p>
   <button class="btn btn-info text-xl" on:click={loginDemo}>Login</button>
   {/if}
 
 
   {#if demouser}
   {#await profilepromise then}
-  <div class="flex items-center gap-3 p-5 w-full">
+  <div class="flex items-center gap-3 p-5 mb-10 w-full">
     <div class="avatar w-32">
       <div class="rounded-full w-24 ring-2 ring-info ring-offset-4 ring-offset-purple-900">
         <img src={demouser.profile?.image || defaultAvatarUrl} alt="avatar" />
@@ -106,7 +108,10 @@
   </div>
   {/await}
 
+  <h2 class="text-2xl">GrapeVine Web of Trust</h2>
+  <hr class="p-3">
 
+  
   {#if !scorecardspromise}
   Run the Calculation to see your network ... <br><br>
   <button class="btn btn-info text-xl" on:click={calculateScorecards}>Calculate My Grapevine Network</button>
@@ -125,32 +130,34 @@
   <p class="text-sm opacity-50">The calculation took {Math.round(calculationtime)} seconds and produced {cardsMB.toPrecision(4)}MB of data.</p>
 
   <div class="p-5 gap-3">
-    {#each scorecards as scoregroup, index}
+    {#each countScorecardsByScore(scorecards) as score, index}
     <div>
-      <progress class="progress progress-primary w-full" value={(scoregroup.length / numcards ) * 100} max={25}></progress>
-      <p class="text-sm opacity-80">{scoregroup.length} people scored {((scorecards.length - index -1) * .1).toPrecision(2)}</p>
+      <progress class="progress progress-primary w-full" value={(score.count / numcards ) * 100} max={25}></progress>
+      <p class="text-sm opacity-80">{score.count} people scored {score.min.toPrecision(1)} - {score.max.toPrecision(1)}</p>
     </div>
     {/each}
   </div>
   <br>
 
 
-  <!-- <div role="tablist" class="tabs tabs-bordered">
-    <input type="radio" name="my_tabs_2" role="tab" class="tab" aria-label="Top Scores" checked/>
-    <div role="tabpanel" class="tab-content bg-base-100 border-base-300 rounded-box p-6">
-      <p>Here are the top {scorecards[0]?.length} trusted users in your network :</p>
-      {#each scorecards[0] as scorecard }
+  <div role="tablist" class="tabs tabs-boxed tabs-lg">
+    <input type="radio" name="my_tabs_2" role="tab" class="tab" aria-label="Top" checked/>
+    <div role="tabpanel" class="tab-content p-5 gap-2">
+      <br>
+      <p>Here are the top 100 trusted users in your network :</p>
+      {#each scorecards.slice(0,100) as scorecard }
         <ScorecardView scorecard={scorecard}/>
       {/each}
     </div>
-    <input type="radio" name="my_tabs_2" role="tab" class="tab" aria-label="Bottom Scores" />
-    <div role="tabpanel" class="tab-content bg-base-100 border-base-300 rounded-box p-6">
-      <p>Here are the bottom {scorecards?.length} possibly untrustworthy users in your network :</p>
-      {#each scorecards[4] as scorecard }
+    <input type="radio" name="my_tabs_2" role="tab" class="tab" aria-label="Bottom" />
+    <div role="tabpanel" class="tab-content p-5 gap-2">
+      <br>
+      <p>Here are the bottom 100 possibly untrustworthy users in your network :</p>
+      {#each scorecards.slice((scorecards.length - 101), (scorecards.length - 1)) as scorecard }
         <ScorecardView scorecard={scorecard}/>
       {/each}
     </div>
-  </div> -->
+  </div>
     {/if}
   {/await}
   {/if}

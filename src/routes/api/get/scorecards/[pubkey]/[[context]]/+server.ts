@@ -1,5 +1,5 @@
-import {GrapeRank} from "graperank-nodejs/src"
-import type { EngineRequest, Scorecard } from "graperank-nodejs/src/types"
+import {DEMO_CONTEXT, GrapeRank} from "graperank-nodejs/src"
+import type { ApiDataTypes, EngineRequest, Scorecard, ScorecardsDataStorage } from "graperank-nodejs/src/types"
 import { json, type RequestHandler } from "@sveltejs/kit";
 
 /**
@@ -10,24 +10,28 @@ import { json, type RequestHandler } from "@sveltejs/kit";
 export const GET: RequestHandler = async (request) => {
   let address = request.params.context ? request.params.pubkey+'/'+request.params.context : request.params.pubkey
 
-  let worldview : EngineRequest = 
-  await request.fetch( '/api/get/worldview/'+address)
-    .then( (r) => r.json())
+  let enginerequest : EngineRequest = {
+    type : 'scorecards',
+    keys : {
+      observer: request.params.pubkey,
+      context : request.params.context || DEMO_CONTEXT
+    }
+  }
 
-  let scorecards : Scorecard[] | undefined 
+  // let scorecards : Scorecard[] | undefined 
   
   // if(!req.protocols) throw("missing `protocols` object required in request")
   // if(!req.params) req.params = {}
-  console.log("GrapeVine : instantiating GrapeRank with worldview : ", worldview)
+  console.log("GrapeVine : instantiating GrapeRank with request : ", enginerequest)
 
-  const graperank = new GrapeRank(worldview,false)
-  
+  let graperankdata : ApiDataTypes | undefined
+  const graperank = new GrapeRank(enginerequest)
   const starttime = Date.now()
   console.log("GrapeVine : calling GrapeRank.get()")
   try{
-    scorecards = await graperank.get()
-    if(scorecards){
-      console.log("GrapeVine : GrapeRank complete with ", scorecards?.length || 0, " records")
+    graperankdata = await graperank.get() as ScorecardsDataStorage
+    if(graperankdata && Object.hasOwn(graperankdata, 'length')) {
+      console.log("GrapeVine : GrapeRank complete with ", graperankdata.length || 0, " records")
     }else{
       throw("GrapeVine : no results")
     }
@@ -39,5 +43,5 @@ export const GET: RequestHandler = async (request) => {
   const endtime = Date.now()
   console.log("GrapeVine : elapsed time = ",(endtime - starttime) * .001," seconds")
 
-  return json(scorecards)
+  return json(graperankdata)
 }
