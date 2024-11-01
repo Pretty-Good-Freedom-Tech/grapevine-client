@@ -1,10 +1,12 @@
 import type { Scorecard, ScorecardsDataStorage } from "graperank-nodejs/src/types";
+const DEMO_CONTEXT = 'grapevine-web-of-trust-demo'
 
-export async function fetchScorecards(pubkey : string, context? : string) : Promise<Scorecard[] | undefined>{
+export async function fetchScorecards(pubkey : string, context? : string, recalculate? : boolean) : Promise<Scorecard[] | undefined>{
   console.log('grapevine getScorecards() params : ',pubkey,context)
+  context = context || DEMO_CONTEXT
+  let query = recalculate ? 'recalculate' : ''
   let scorecards : Scorecard[] = []
-  let address = context ? pubkey+'/'+context : pubkey
-  await fetch('/api/get/scorecards/'+address)
+  await fetch('/api/get/scorecards/'+pubkey+'/'+context+'?'+query )
     .then(async r => {
       console.log('grapevine getScorecards() : fetched from api')
       let data = await r.json() as ScorecardsDataStorage
