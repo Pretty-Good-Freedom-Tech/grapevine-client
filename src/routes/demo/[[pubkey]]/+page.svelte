@@ -1,6 +1,7 @@
 
 <script lang="ts">
 	import ScorecardView from "$lib/components/scorecard-view.svelte";
+	import ScorecardsAccordion from "$lib/components/scorecards-accordion.svelte";
 	import { ndk } from "$lib/stores/ndk.store";
 	import { countScorecardsByScore, fetchScorecards, filterScorecardsByScore } from "$lib/utils/scorecards";
   import NDK, { NDKNip07Signer , NDKUser, type NDKUserProfile} from "@nostr-dev-kit/ndk";
@@ -144,18 +145,26 @@
     <input type="radio" name="my_tabs_2" role="tab" class="tab" aria-label="Top" checked/>
     <div role="tabpanel" class="tab-content p-5 gap-2">
       <br>
-      <p>Here are the top 100 trusted users in your network :</p>
-      {#each scorecards.slice(0,100) as scorecard }
-        <ScorecardView scorecard={scorecard}/>
-      {/each}
+      <p>Here are the top 100 influential users in your network:</p>
+        <ScorecardsAccordion scorecards={scorecards.slice(0,100)}/>
     </div>
+    <!-- <input type="radio" name="my_tabs_2" role="tab" class="tab" aria-label="99" />
+    <div role="tabpanel" class="tab-content p-5 gap-2">
+      <br>
+      <p>Here are top 100 users with score of .99 :</p>
+      <ScorecardsAccordion scorecards={filterScorecardsByScore(scorecards, 98,99, [0, 100])}/>
+    </div>
+    <input type="radio" name="my_tabs_2" role="tab" class="tab" aria-label="90" />
+    <div role="tabpanel" class="tab-content p-5 gap-2">
+      <br>
+      <p>Here are top 100 users with score of .89 :</p>
+      <ScorecardsAccordion scorecards={filterScorecardsByScore(scorecards, 88,89, [0, 100])}/>
+    </div> -->
     <input type="radio" name="my_tabs_2" role="tab" class="tab" aria-label="Bottom" />
     <div role="tabpanel" class="tab-content p-5 gap-2">
       <br>
       <p>Here are the bottom 100 possibly untrustworthy users in your network :</p>
-      {#each scorecards.slice((scorecards.length - 101), (scorecards.length - 1)) as scorecard }
-        <ScorecardView scorecard={scorecard}/>
-      {/each}
+      <ScorecardsAccordion scorecards={scorecards.slice((scorecards.length - 101))}/>
     </div>
   </div>
     {/if}
