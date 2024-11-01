@@ -37,7 +37,7 @@ export function countScorecardsByScore(scorecards : Scorecard[], increment = .1,
 
 export function filterScorecardsByScore(scorecards : Scorecard[], min : number, max :number, slice? : [number, number]) : Scorecard[]{
   const filtered = scorecards.filter((scorecard)=>{
-    if(scorecard.score == undefined) return false
+    if(scorecard.score === undefined) return false
     let match = false
     if(scorecard.score >= min) match = true
     if(scorecard.score > max) match = false

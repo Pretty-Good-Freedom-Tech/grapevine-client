@@ -25,18 +25,30 @@
     </div> 
 
     <div class="grow text-left">
-      <div class="font-bold">{ profile ? profile.name || profile.username : ""}</div>
+      <div class="font-bold">{ 
+        profile?.name && profile.name.length < 18 ? profile.name 
+        : profile?.name ? profile.name.substring(0,18)+'...' 
+        : typeof profile?.username == 'string' && profile.username.length < 18 ? profile.username 
+        : typeof profile?.username == 'string' ? profile.username.substring(0,18)+'...' 
+        : profile?.username || ""
+        }</div>
       <div class="text-sm opacity-50">{ 
-        profile?.nip05 && profile.nip05.length < 32 ? profile.nip05 
-        : profile?.nip05 ? profile.nip05.substring(0,16)+'...' 
+        profile?.nip05 && profile.nip05.length < 24 ? profile.nip05 
+        : profile?.nip05 ? profile.nip05.substring(0,24)+'...' 
         : user.npub.substring(0,24)+'...'}</div>
     </div>
 
-    <div class="rounded-lg bg-primary text-black p-2">
-      <div class="text-2xl"><big>{scorecard.score}</big> 
-      <!-- <sub>{scorecard.confidence}</sub> -->
+    <!-- <div class="rounded-lg bg-primary text-black p-2"> -->
+      <div
+        class="radial-progress text-primary text-xl"
+        style="--value:{Math.floor((scorecard?.score || 0)  * 100)};"
+        role="progressbar">
+        {scorecard.score?.toPrecision(4)}
       </div>
-    </div>
+      <!-- <div class="text-2xl"><big>{scorecard.score?.toPrecision(2)}</big>  -->
+      <!-- <sub>{scorecard.confidence}</sub> -->
+      <!-- </div> -->
+    <!-- </div> -->
   </div>
 {/if}
 {#if !user}
