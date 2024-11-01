@@ -38,16 +38,18 @@
         : user.npub.substring(0,24)+'...'}</div>
     </div>
 
-    <!-- <div class="rounded-lg bg-primary text-black p-2"> -->
+    <div class="indicator">
+      <div class="indicator-item indicator-bottom badge badge-info">
+        {scorecard.confidence}
+      </div>
       <div
         class="radial-progress text-primary text-xl"
         style="--value:{Math.floor((scorecard?.score || 0)  * 100)};"
         role="progressbar">
-        {scorecard.score?.toPrecision(4)}
+        {scorecard.score?.toPrecision(2)}
       </div>
       <!-- <div class="text-2xl"><big>{scorecard.score?.toPrecision(2)}</big>  -->
-      <!-- <sub>{scorecard.confidence}</sub> -->
-      <!-- </div> -->
+      </div>
     <!-- </div> -->
   </div>
 {/if}

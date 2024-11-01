@@ -1,6 +1,7 @@
 
 <script lang="ts">
-	import ScorecardView from "$lib/components/scorecard-view.svelte";
+  // import { DEMO_CONTEXT } from "graperank-nodejs/src";
+  import ScorecardView from "$lib/components/scorecard-view.svelte";
 	import ScorecardsAccordion from "$lib/components/scorecards-accordion.svelte";
 	import { ndk } from "$lib/stores/ndk.store";
 	import { countScorecardsByScore, fetchScorecards, filterScorecardsByScore } from "$lib/utils/scorecards";
@@ -9,6 +10,7 @@
 	import { onMount } from "svelte";
 
 	// export let data;
+  const DEMO_CONTEXT = 'grapevine-web-of-trust-demo'
 
   const defaultAvatarUrl = "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
 
@@ -54,10 +56,10 @@
   return 
  }
 
- async function calculateScorecards(){
+ async function calculateScorecards(recalculate? : boolean){
   if(!demouser) return false
   calculationtime = Date.now()
-  scorecardspromise = fetchScorecards(demouser.pubkey)
+  scorecardspromise = fetchScorecards(demouser.pubkey, DEMO_CONTEXT, recalculate)
   scorecardspromise.then((scorecardstorage)=>{
     if(scorecardstorage){
       scorecards = scorecardstorage
@@ -109,13 +111,18 @@
   </div>
   {/await}
 
-  <h2 class="text-2xl">GrapeVine Web of Trust</h2>
+  <div class="flex justify-between">
+    <h2 class="text-2xl ">GrapeVine Web of Trust</h2>
+    {#if scorecards.length}
+    <button class="btn btn-sm btn-info text-right" on:click={() => calculateScorecards(true)}>Recalculate</button>
+    {/if}
+  </div>
   <hr class="p-3">
 
   
   {#if !scorecardspromise}
   Run the Calculation to see your network ... <br><br>
-  <button class="btn btn-info text-xl" on:click={calculateScorecards}>Calculate My Grapevine Network</button>
+  <button class="btn btn-info text-xl" on:click={() => calculateScorecards()}>Calculate My Grapevine Network</button>
   {/if}
 
   {#if scorecardspromise}
