@@ -40,6 +40,6 @@
 	"type": "module",
 	"dependencies": {
 		"@nostr-dev-kit/ndk": "^2.10.0",
-		"graperank-nodejs": "file:../graperank-nodejs"
+		"graperank-nodejs": "github:Pretty-Good-Freedom-Tech/graperank-nodejs"
 	}
 }
