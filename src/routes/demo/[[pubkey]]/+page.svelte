@@ -86,7 +86,7 @@
 </script>
 
 <section class="p-5">
-  <h2 class="badge badge-primary badge-lg">DEMO</h2>
+  <div class="text-center"><span class="badge badge-primary badge-outline badge-lg p-4 mb-3">DEMO</span></div>
 
   {#if !demouser}
   <p class="text-lg p-5">Login with Nostr extention to launch the demo </p>
@@ -134,47 +134,28 @@
 
   {:then}
   {#if scorecards}
-  <p class="text-xl">GrapeRank found {numcards || 0} people in your network.</p>
-  <p class="text-sm opacity-50">The calculation took {Math.round(calculationtime)} seconds and produced {cardsMB.toPrecision(4)}MB of data.</p>
-
-  <div class="p-5 gap-3">
-    {#each countScorecardsByScore(scorecards) as score, index}
-    <div>
-      <progress class="progress progress-primary w-full" value={(score.count / numcards ) * 100} max={25}></progress>
-      <p class="text-sm opacity-80">{score.count} people scored {score.min.toPrecision(1)} - {score.max.toPrecision(1)}</p>
-    </div>
-    {/each}
-  </div>
-  <br>
-
 
   <div role="tablist" class="tabs tabs-boxed tabs-lg">
-    <input type="radio" name="my_tabs_2" role="tab" class="tab" aria-label="Top" checked/>
+    <input type="radio" name="grapevine" role="tab" class="tab" aria-label="Summary" checked/>
     <div role="tabpanel" class="tab-content p-5 gap-2">
-      <br>
-      <p>Here are the top 100 influential users in your network:</p>
-        <ScorecardsAccordion scorecards={scorecards.slice(0,100)}/>
+      <p class="text-xl">GrapeRank found {numcards || 0} people in your network.</p>
+      <p class="text-sm opacity-50">The calculation took {Math.round(calculationtime)} seconds and produced {cardsMB.toPrecision(4)}MB of data.</p>
+    
+      <div class="p-5 gap-3">
+        {#each countScorecardsByScore(scorecards) as score, index}
+        <div>
+          <progress class="progress progress-primary w-full" value={(score.count / numcards ) * 100} max={25}></progress>
+          <p class="text-sm opacity-80">{score.count} people scored {score.min.toPrecision(1)} - {score.max.toPrecision(1)}</p>
+        </div>
+        {/each}
+      </div>
     </div>
-    <!-- <input type="radio" name="my_tabs_2" role="tab" class="tab" aria-label="99" />
+    <input type="radio" name="grapevine" role="tab" class="tab" aria-label="Results" />
     <div role="tabpanel" class="tab-content p-5 gap-2">
-      <br>
-      <p>Here are top 100 users with score of .99 :</p>
-      <ScorecardsAccordion scorecards={filterScorecardsByScore(scorecards, 98,99, [0, 100])}/>
-    </div>
-    <input type="radio" name="my_tabs_2" role="tab" class="tab" aria-label="90" />
-    <div role="tabpanel" class="tab-content p-5 gap-2">
-      <br>
-      <p>Here are top 100 users with score of .89 :</p>
-      <ScorecardsAccordion scorecards={filterScorecardsByScore(scorecards, 88,89, [0, 100])}/>
-    </div> -->
-    <input type="radio" name="my_tabs_2" role="tab" class="tab" aria-label="Bottom" />
-    <div role="tabpanel" class="tab-content p-5 gap-2">
-      <br>
-      <p>Here are the bottom 100 possibly untrustworthy users in your network :</p>
-      <ScorecardsAccordion scorecards={scorecards.slice((scorecards.length - 101))}/>
+        <ScorecardsAccordion {scorecards}/>
     </div>
   </div>
-    {/if}
+  {/if}
   {/await}
   {/if}
 
