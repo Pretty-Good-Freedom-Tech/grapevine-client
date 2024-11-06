@@ -54,15 +54,15 @@
 <div class="card w-96">
   <div class="card-body">
     <h2 class="card-title">Try Our Demo</h2>
-    <p><b>My Grapevine Reccomended List</b> <br> Discover interesting Nostriches from your follows follows.</p>
+    <!-- <p><b>My Grapevine Reccomended List</b> <br> Discover interesting Nostriches from your follows follows.</p>
     <div class="card-actions justify-start">
       <a class="btn btn-info text-xl text-base-100" target="_blank" href="https://brainstorm.ninja/#/grapevine/actions/export">Go To Grapevine List Builder</a>
+    </div> -->
+    <div class="card-actions justify-start">
+
+    <button class="btn join-item btn-info text-xl" on:click={()=>goto('/demo/'+observer)}>Grapevine Demo</button>
     </div>
 
-    <div class="join">
-      <input bind:value={observer} class="input join-item border-info" placeholder="paste your npub" type="text" />
-      <button class="btn join-item btn-info text-xl" on:click={()=>goto('/demo/'+observer)}>Demo</button>
-    </div>
   </div>
 </div>
 
