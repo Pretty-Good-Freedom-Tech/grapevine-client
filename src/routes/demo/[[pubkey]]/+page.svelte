@@ -3,11 +3,13 @@
   // import { DEMO_CONTEXT } from "graperank-nodejs/src";
   import ScorecardView from "$lib/components/scorecard-view.svelte";
 	import ScorecardsAccordion from "$lib/components/scorecards-accordion.svelte";
+	import ScorecardsFilter from "$lib/components/scorecards-filter.svelte";
 	import { ndk } from "$lib/stores/ndk.store";
 	import { countScorecardsByScore, fetchScorecards, filterScorecardsByScore } from "$lib/utils/scorecards";
   import NDK, { NDKNip07Signer , NDKUser, type NDKUserProfile} from "@nostr-dev-kit/ndk";
   import type { Scorecard } from "graperank-nodejs/src/types";
 	import { onMount } from "svelte";
+	import { writable } from "svelte/store";
 
 	// export let data;
   const DEMO_CONTEXT = 'grapevine-web-of-trust-demo'
@@ -17,9 +19,7 @@
   let scorecardspromise : Promise<Scorecard[] | undefined>
   let profilepromise : Promise<NDKUserProfile | null>
   let scorecards : Scorecard[]
-  $: scorecards = []
-  let filteredcards : Scorecard[]
-  $: filteredcards = []
+  let filtered = writable<Scorecard[]>()
   // let topscorecards : Scorecard[] 
   // $: topscorecards= []
   // let bottomscorecards : Scorecard[] 
@@ -63,6 +63,7 @@
   scorecardspromise.then((scorecardstorage)=>{
     if(scorecardstorage){
       scorecards = scorecardstorage
+      filtered.set(scorecards)
       numcards = scorecards.length
       cardsMB = new TextEncoder().encode(JSON.stringify(scorecards)).length  / 1024 / 1024;
       // scorecards = groupScorecardsByScore(scorecardstorage,.1)
@@ -113,7 +114,7 @@
 
   <div class="flex justify-between">
     <h2 class="text-2xl ">GrapeVine Web of Trust</h2>
-    {#if scorecards.length}
+    {#if scorecards?.length}
     <button class="btn btn-sm btn-info text-right" on:click={() => calculateScorecards(true)}>Recalculate</button>
     {/if}
   </div>
@@ -137,6 +138,7 @@
 
   <div role="tablist" class="tabs tabs-boxed tabs-lg">
     <input type="radio" name="grapevine" role="tab" class="tab" aria-label="Summary" checked/>
+
     <div role="tabpanel" class="tab-content p-5 gap-2">
       <p class="text-xl">GrapeRank found {numcards || 0} people in your network.</p>
       <p class="text-sm opacity-50">The calculation took {Math.round(calculationtime)} seconds and produced {cardsMB.toPrecision(4)}MB of data.</p>
@@ -150,10 +152,17 @@
         {/each}
       </div>
     </div>
+
     <input type="radio" name="grapevine" role="tab" class="tab" aria-label="Results" />
     <div role="tabpanel" class="tab-content p-5 gap-2">
-        <ScorecardsAccordion {scorecards}/>
+        <ScorecardsAccordion scorecards={filtered}/>
     </div>
+
+    <input type="radio" name="grapevine" role="tab" class="tab" aria-label="Filter" />
+    <div role="tabpanel" class="tab-content p-5 gap-2">
+        <ScorecardsFilter {scorecards} {filtered}/>
+    </div>
+
   </div>
   {/if}
   {/await}

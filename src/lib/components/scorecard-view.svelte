@@ -25,16 +25,16 @@
     </div> 
 
     <div class="grow text-left">
-      <div class="font-bold">{ 
+      <a class="font-bold underline" href="https://njump.me/{user.npub}" target="_blank">{ 
         profile?.name && profile.name.length < 18 ? profile.name 
         : profile?.name ? profile.name.substring(0,18)+'...' 
         : typeof profile?.username == 'string' && profile.username.length < 18 ? profile.username 
         : typeof profile?.username == 'string' ? profile.username.substring(0,18)+'...' 
         : profile?.username || ""
-        }</div>
-      <div class="text-sm opacity-50">{ 
-        profile?.nip05 && profile.nip05.length < 24 ? profile.nip05 
-        : profile?.nip05 ? profile.nip05.substring(0,24)+'...' 
+        }</a>
+      <div class="text-xs opacity-50">{ 
+        profile?.nip05 && profile.nip05.length < 18 ? profile.nip05 
+        : profile?.nip05 ? profile.nip05.substring(0,18)+'...' 
         : user.npub.substring(0,24)+'...'}</div>
     </div>
 

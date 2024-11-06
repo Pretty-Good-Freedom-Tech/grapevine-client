@@ -3,17 +3,18 @@
 	import ScorecardView from "./scorecard-view.svelte";
 	import ScorecardDataView from "./ScorecardData-view.svelte";
 	import VirtualList from "./VirtualList.svelte";
+	import type { Writable } from "svelte/store";
 
-  export let scorecards : Scorecard[] 
+  export let scorecards : Writable<Scorecard[]>
 
   let start : number = 0
   let end : number = 1
 
 </script>
-<div class="mt-[-30px] mr-10 text-right"><small>showing {start}-{end} of {scorecards.length}</small></div>
-  <VirtualList items={scorecards} bind:start bind:end let:item height='480px'>
+<div class="mt-[-30px] mr-10 text-right"><small>showing {start}-{end} of {$scorecards.length}</small></div>
+  <VirtualList items={$scorecards} bind:start bind:end let:item height='480px'>
     <div class="collapse collapse-arrow join-item border-base-300 border">
-        <input type="radio" name="my-accordion-4" />
+        <input type="radio" name="my-accordion-4" class="ml-[300px]" style="position:relative right:0px"/>
         <div class="collapse-title text-xl font-medium">
           <ScorecardView scorecard={item}/>
         </div>
