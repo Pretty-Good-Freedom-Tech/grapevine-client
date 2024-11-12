@@ -154,7 +154,7 @@
     </div>
 
     <input type="radio" name="grapevine" role="tab" class="tab" aria-label="Results" />
-    <div role="tabpanel" class="tab-content p-5 gap-2">
+    <div role="tabpanel" class="tab-content gap-2">
         <ScorecardsAccordion scorecards={filtered}/>
     </div>
 

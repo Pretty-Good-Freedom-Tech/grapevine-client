@@ -7,25 +7,25 @@
 </script>
 
 {#if scorecard.input}
-<div class="stats stats-horizontal">  
+<div class="stats stats-horizontal w-full">  
   <div class="stat">
     <div class="stat-title">Followed By</div>
     <div class="stat-value">{Math.floor(scorecard.input.count['nostr-follows']) || 0}</div>
     <div class="stat-desc">users in your network</div>
   </div>  
   <div class="stat">
-    <div class="stat-title">DoS</div>
+    <div class="stat-title">Degrees</div>
     <div class="stat-value">{Math.floor(scorecard.input.dos)}</div>
-    <div class="stat-desc">deghrees of separation</div>
+    <div class="stat-desc">of separation</div>
   </div>  
   <div class="stat">
-    <div class="stat-title">Adjusted Weight</div>
+    <div class="stat-title">Weight</div>
     <div class="stat-value">{Math.floor(scorecard.input.weights)}</div>
-    <div class="stat-desc">of follows for this user</div>
+    <div class="stat-desc">of follows</div>
   </div>  
 </div>
 
-<div class="stats stats-horizontal">
+<div class="stats stats-horizontal w-full">
 
   <div class="stat">
     <div class="stat-title">Muted By</div>
