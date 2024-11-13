@@ -6,7 +6,8 @@ onmessage = function(event){
     console.log('GrapeVine : running worker : scorecards-filter : ',input)
     filterBigArray(scorecards, (scorecard)=>{
       return true &&
-        (!input.score || ((scorecard.score || 0 ) > 0 && input.score >= (scorecard.score || 0))) &&
+        (input.showzeroscores || (!input.showzeroscores && scorecard.score)) &&
+        (!input.score || (input.score >= (scorecard.score || 0))) &&
         (!input.dos || input.dos == scorecard.input?.dos) &&
         (!input.followedby || input.followedby >= (scorecard.input?.count['nostr-follows'] || 0)) &&
         (!input.mutedby || input.mutedby >= (scorecard.input?.count['nostr-mutes'] || 0)) &&

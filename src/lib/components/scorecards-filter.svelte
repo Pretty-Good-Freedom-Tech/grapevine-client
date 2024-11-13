@@ -7,6 +7,7 @@
 	import { onMount } from "svelte";
 
   type filterinput = {
+    showzeroscores : boolean,
     score : number | undefined,
     confidence : number,
     dos : number,
@@ -24,6 +25,7 @@
   export let filtering : Writable<boolean>
 
   const input : filterinput = {
+    showzeroscores : false,
     score : 0,
     confidence : 0,
     dos :  0,
@@ -34,8 +36,7 @@
 
   let filterworker : Worker
 
-  onMount(()=>{
-  })
+  onMount(()=>{filter()})
 
   async function filter(){
     filtering.set(true)
@@ -64,13 +65,20 @@
   {!$filtering ? $filtered?.length : ''} of {scorecards.length}</small>
 </div>
 
-
+<br/>
 
 <label>
-  <span class="label-text">Influence Score &nbsp;</span>
-  {#if input.score}
-  &lt;= <input class="input w-24 input-sm" type="text" bind:value={input.score}/>
-  {/if} 
+  <div class="flex justify-between">
+    <div>
+      <span class="label-text">Influence Score &nbsp;</span>
+      {#if input.score}
+      &lt;= <input class="input w-24 input-sm" type="text" bind:value={input.score}/>
+      {/if} 
+    </div>
+    <label class="text-sm text-right cursor-pointer">show zero scores &nbsp;
+      <input type="checkbox" class="checkbox checkbox-xs" bind:checked={input.showzeroscores} on:change={() => filter()}/>
+    </label>
+  </div>
   <input type="range" min="0" max="1" step=".01" bind:value={input.score} on:change={() => filter()} class="range" />
   <div class="flex w-full justify-between px-2 text-xs">
     <span>n/a</span>

@@ -87,9 +87,9 @@
 
   <div class="flex justify-between">
     <h2 class="text-2xl ">GrapeVine Web of Trust</h2>
-    {#if scorecards?.length}
+    <!-- {#if scorecards?.length}
     <button class="btn btn-sm btn-info text-right" on:click={() => calculateScorecards(true)}>Recalculate</button>
-    {/if}
+    {/if} -->
   </div>
   <hr class="p-3">
 

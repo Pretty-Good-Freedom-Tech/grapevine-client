@@ -51,7 +51,7 @@
 {#if !$scorecards.length}<span class="m-10 loading loading-bars loading-lg"></span>
 {/if}
 
-<div class=" mr-10 text-right"><small>showing {start}-{end} of {$scorecards.length}</small></div>
+<div class=" mr-10 text-right"><small>showing {start}-{end} of {$scorecards.length} filtered</small></div>
 <label class="label cursor-pointer">
   <span class="label-text">Sort by : </span>
   <select class="select w-full max-w-xs" bind:value={sortby}  on:change={sort}>
