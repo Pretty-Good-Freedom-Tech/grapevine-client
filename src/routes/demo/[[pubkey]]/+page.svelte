@@ -20,15 +20,9 @@
   let profilepromise : Promise<NDKUserProfile | null>
   let scorecards : Scorecard[]
   let filtered = writable<Scorecard[]>()
-  // let topscorecards : Scorecard[] 
-  // $: topscorecards= []
-  // let bottomscorecards : Scorecard[] 
-  // $: bottomscorecards = []
-  // let grouped : Scorecard[][] | undefined
-  // $: grouped = undefined
-  // let groupincrement : number = 1
-  // let groupselect : number
-  // $: groupselect = 0
+  let filtering = writable<boolean>()
+  // filtered.subscribe(()=>{ rerender = !rerender })
+
   let numcards : number
   $: numcards = 0
   let cardsMB : number
@@ -38,16 +32,7 @@
   let demouser : NDKUser | undefined
   $: demouser = $ndk.activeUser
   onMount(async ()=>{
-    // console.log('grapevine page onMount() with pubkey ', data.pubkey)
-    // if(pubkey) numcards = await setGrouped(pubkey)
   })
-
-  // async function setGrouped(observer : string) : Promise<number | undefined>{
-  //   console.log('grapevine calling getScorecards()')
-  //   scorecards = await getScorecards(observer, DEMO_CONTEXT)
-  //   if(!!scorecards) grouped = groupScorecardsByScore(scorecards, groupincrement)
-  //   return scorecards?.length
-  // }
  
  async function loginDemo(){
   $ndk.signer = new NDKNip07Signer()
@@ -66,24 +51,12 @@
       filtered.set(scorecards)
       numcards = scorecards.length
       cardsMB = new TextEncoder().encode(JSON.stringify(scorecards)).length  / 1024 / 1024;
-      // scorecards = groupScorecardsByScore(scorecardstorage,.1)
       calculationtime = (Date.now() - calculationtime) * .001
     }
-    // topscorecards = scorecardsByScore(99, 100)
-    // bottomscorecards = scorecardsByScore(0, .1)
   })
   return true
 }
 
-//  function scorecardsByScore(min = 0, max = 1){
-//   return scorecards.filter((card)=>{
-//     let match = true
-//     if(!card.score) return false
-//     if(card.score < min) match = false
-//     if(card.score > max) match = false
-//     return match
-//   })
-//  }
 </script>
 
 <section class="p-5">
@@ -155,12 +128,12 @@
 
     <input type="radio" name="grapevine" role="tab" class="tab" aria-label="Results" />
     <div role="tabpanel" class="tab-content gap-2">
-        <ScorecardsAccordion scorecards={filtered}/>
+      {#if !$filtering }<ScorecardsAccordion scorecards={filtered} />{/if}
     </div>
 
     <input type="radio" name="grapevine" role="tab" class="tab" aria-label="Filter" />
     <div role="tabpanel" class="tab-content p-5 gap-2">
-        <ScorecardsFilter {scorecards} {filtered}/>
+        <ScorecardsFilter {scorecards} {filtered} {filtering}/>
     </div>
 
   </div>

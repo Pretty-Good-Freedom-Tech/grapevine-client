@@ -10,9 +10,9 @@
   export let scorecards : Writable<Scorecard[]>
 
   let profiles : Writable<Map<String,NDKUserProfile>> = writable(new Map())
-  let rerender = false
   let start : number = 0
   let end : number = 1
+  let rerender = false
 
   const sortoptions : Map<string,(a: Scorecard, b: Scorecard) => number> = new Map([
     ['Highest Influence Score',
@@ -42,11 +42,14 @@
   ])
   let sortby : string = sortoptions.keys().next().value as string
   function sort(){
-    $scorecards.sort(sortoptions.get(sortby))
+    if($scorecards) $scorecards.sort(sortoptions.get(sortby))
     rerender = !rerender
   }
   onMount(sort)
 </script>
+
+{#if !$scorecards.length}<span class="m-10 loading loading-bars loading-lg"></span>
+{/if}
 
 <div class=" mr-10 text-right"><small>showing {start}-{end} of {$scorecards.length}</small></div>
 <label class="label cursor-pointer">
@@ -61,7 +64,7 @@
 {#key rerender}
   <VirtualList items={$scorecards} bind:start bind:end let:item height='480px'>
     <div class="collapse collapse-arrow">
-        <input type="radio" name="my-accordion-4" class="w-32 ml-[300px]" style="position:relative right:0px"/>
+        <input type="radio" name="scorecards-list" class="w-32 ml-[300px]" style="position:relative right:0px"/>
         <div class="collapse-title text-xl font-medium p-0">
           <ScorecardView scorecard={item} {profiles}/>
         </div>
@@ -71,4 +74,3 @@
       </div>    
   </VirtualList>
 {/key}
-

@@ -4,53 +4,76 @@
 	import ScorecardView from "./scorecard-view.svelte";
 	import ScorecardDataView from "./ScorecardData-view.svelte";
 	import type { Writable } from "svelte/store";
+	import { onMount } from "svelte";
+
+  type filterinput = {
+    score : number | undefined,
+    confidence : number,
+    dos : number,
+    followedby : number,
+    mutedby : number,
+    reportedby : number
+  }
+  type filterdata = {
+    scorecards: Scorecard[], 
+    input : filterinput
+  }
 
   export let scorecards : Scorecard[] 
   export let filtered : Writable<Scorecard[]>
+  export let filtering : Writable<boolean>
 
-  let score : number | undefined = 0
-  // let scoretens : number | undefined = score ? Math.round(score *10) *10 : 9
-  // let scoreones : number | undefined = score ? Math.trunc(score, 10) *10 : 9
-  let confidence : number = 0
-  let dos : number  = 0
-  let numfollowedby : number  = 0
-  let followedbymore : boolean = false
-  let nummutedby : number  = 0
-  let mutedbymore : boolean = false
-  let numreportedby : number  = 0
-  let reportedbymore : boolean = false
+  const input : filterinput = {
+    score : 0,
+    confidence : 0,
+    dos :  0,
+    followedby : 0,
+    mutedby : 0,
+    reportedby : 0
+  }
 
-  let filteresult : Scorecard[] = []
-  let disabled : boolean
-  $: disabled = false
+  let filterworker : Worker
+
+  onMount(()=>{
+  })
 
   async function filter(){
-    disabled = true
-    filtered.set( await filterBigArray(scorecards, (scorecard)=>{
-      return true &&
-        (!score || ((scorecard.score || 0 ) > 0 && score >= (scorecard.score || 0))) &&
-        (!dos || dos == scorecard.input?.dos) &&
-        (!numfollowedby || numfollowedby >= (scorecard.input?.count['nostr-follows'] || 0)) &&
-        (!nummutedby || nummutedby >= (scorecard.input?.count['nostr-mutes'] || 0)) &&
-        (!numreportedby || numreportedby >= (scorecard.input?.count['nostr-reports'] || 0))
-    }))
-    disabled = false
+    filtering.set(true)
+    if(filterworker) filterworker.terminate()
+    filterworker = new Worker("/workers/scorecards-filter.worker.js")
+    return new Promise<void>((resolve)=>{
+      filterworker.onmessage = (event)=>{
+        if(event.data){
+          filtered.set(event.data)
+          filtering.set(false)
+          filterworker.terminate()
+          resolve()
+        }
+      }
+      filterworker.postMessage({scorecards,input})
+    })
+
   }
 
 </script>
 
-<div class="mt-[-20px] mr-10 text-right"><small>Filtering {$filtered.length} of {scorecards.length}</small></div>
+
+<div class="mt-[-20px] mr-10 text-right">
+  <small>Filtering 
+  {#if $filtering}<span class="loading loading-dots loading-sm"></span>{/if}
+  {!$filtering ? $filtered?.length : ''} of {scorecards.length}</small>
+</div>
 
 
 
 <label>
   <span class="label-text">Influence Score &nbsp;</span>
-  {#if score}
-  &lt;= <input class="input w-24 input-sm" type="text" bind:value={score}/>
+  {#if input.score}
+  &lt;= <input class="input w-24 input-sm" type="text" bind:value={input.score}/>
   {/if} 
-  <input type="range" {disabled} min="0" max="1" step=".01" bind:value={score} on:change={() => filter()} class="range" />
+  <input type="range" min="0" max="1" step=".01" bind:value={input.score} on:change={() => filter()} class="range" />
   <div class="flex w-full justify-between px-2 text-xs">
-    <span>0</span>
+    <span>n/a</span>
     <span>.25</span>
     <span>.5</span>
     <span>.75</span>
@@ -62,12 +85,12 @@
 
 <label>
   <span class="label-text">Degrees of Separation &nbsp;</span>
-  {#if dos}
-  == <input class="input input-sm w-24" type="text" bind:value={dos}/>
+  {#if input.dos}
+  == <input class="input input-sm w-24" type="text" bind:value={input.dos}/>
   {/if}
-  <input type="range" {disabled} min="0" max="6" bind:value={dos} class="range" step="1" on:change={() => filter()}/>
+  <input type="range" min="0" max="6" bind:value={input.dos} class="range" step="1" on:change={() => filter()}/>
   <div class="flex w-full justify-between px-2 text-xs">
-    <span>0</span>
+    <span>n/a</span>
     <span>1</span>
     <span>2</span>
     <span>3</span>
@@ -81,12 +104,12 @@
 
 <label>
   <span class="label-text">Followed By &nbsp; </span>
-  {#if numfollowedby}
-  &lt;= <input class="input input-sm w-24" type="text" bind:value={numfollowedby}/>    
+  {#if input.followedby}
+  &lt;= <input class="input input-sm w-24" type="text" bind:value={input.followedby}/>    
   {/if}
-  <input type="range" {disabled} min="0" max="5000" bind:value={numfollowedby} on:change={() => filter()} class="range" step="100"/>
+  <input type="range" min="0" max="5000" bind:value={input.followedby} on:change={() => filter()} class="range" step="100"/>
   <div class="flex w-full justify-between px-2 text-xs">
-    <span>0</span>
+    <span>n/a</span>
     <span>.</span>
     <span>.</span>
     <span>.</span>
@@ -124,12 +147,12 @@
 
 <label>
   <span class="label-text">Muted By &nbsp; </span>
-  {#if nummutedby}
-  &lt;= <input class="input input-sm w-24" type="text" bind:value={nummutedby}/>    
+  {#if input.mutedby}
+  &lt;= <input class="input input-sm w-24" type="text" bind:value={input.mutedby}/>    
   {/if}
-  <input type="range" {disabled} min="0" max="300" bind:value={nummutedby} on:change={() => filter()} class="range" step="10"/>
+  <input type="range" min="0" max="300" bind:value={input.mutedby} on:change={() => filter()} class="range" step="10"/>
   <div class="flex w-full justify-between px-2 text-xs">
-    <span>0</span>
+    <span>n/a</span>
     <span>.</span>
     <span>.</span>
     <span>.</span>
@@ -155,12 +178,12 @@
 
 <label>
   <span class="label-text">Reported By &nbsp; </span>
-  {#if numreportedby}
-  &lt;= <input class="input input-sm w-24" type="text" bind:value={numreportedby}/>    
+  {#if input.reportedby}
+  &lt;= <input class="input input-sm w-24" type="text" bind:value={input.reportedby}/>    
   {/if}
-  <input type="range" {disabled} min="0" max="300" bind:value={numreportedby} on:change={() => filter()} class="range" step="10"/>
+  <input type="range" min="0" max="300" bind:value={input.reportedby} on:change={() => filter()} class="range" step="10"/>
   <div class="flex w-full justify-between px-2 text-xs">
-    <span>0</span>
+    <span>n/a</span>
     <span>.</span>
     <span>.</span>
     <span>.</span>
