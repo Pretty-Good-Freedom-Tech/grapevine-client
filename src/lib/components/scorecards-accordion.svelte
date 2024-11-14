@@ -22,10 +22,14 @@
       (a: Scorecard, b: Scorecard)=> (a.score || 0)  - (b.score || 0)
     ],
     ['Most Followed By',
-      (a: Scorecard, b: Scorecard)=> (b.input?.count['nostr-follows'] || 0)  - (a.input?.count['nostr-follows']  || 0)
+      (a: Scorecard, b: Scorecard) => 
+        (b.input?.count ? b.input.count['nostr-follows'] || 0 : 0) -
+        (a.input?.count ? a.input.count['nostr-follows'] || 0 : 0)
     ],
     ['Least Followed By',
-      (a: Scorecard, b: Scorecard)=> (a.input?.count['nostr-follows']  || 0)  - (b.input?.count['nostr-follows']  || 0)
+      (a: Scorecard, b: Scorecard) => 
+        (a.input?.count ? a.input.count['nostr-follows'] || 0 : 0) -
+        (b.input?.count ? b.input.count['nostr-follows'] || 0 : 0)
     ],
     ['Closest Degree of Separation',
       (a: Scorecard, b: Scorecard)=> (a.input?.dos  || 0)  - (b.input?.dos || 0)
