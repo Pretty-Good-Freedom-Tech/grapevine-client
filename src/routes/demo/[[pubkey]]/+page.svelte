@@ -3,6 +3,7 @@
   // import { DEMO_CONTEXT } from "graperank-nodejs/src";
   import ScorecardView from "$lib/components/scorecard-view.svelte";
 	import ScorecardsAccordion from "$lib/components/scorecards-accordion.svelte";
+	import ScorecardsExport from "$lib/components/scorecards-export.svelte";
 	import ScorecardsFilter from "$lib/components/scorecards-filter.svelte";
 	import { ndk } from "$lib/stores/ndk.store";
 	import { countScorecardsByScore, fetchScorecards, filterScorecardsByScore } from "$lib/utils/scorecards";
@@ -134,6 +135,11 @@
     <input type="radio" name="grapevine" role="tab" class="tab" aria-label="Filter" />
     <div role="tabpanel" class="tab-content p-5 gap-2">
         <ScorecardsFilter {scorecards} {filtered} {filtering}/>
+    </div>
+
+    <input type="radio" name="grapevine" role="tab" class="tab" aria-label="Export" />
+    <div role="tabpanel" class="tab-content p-5 gap-2">
+        <ScorecardsExport scorecards={filtered} context={DEMO_CONTEXT}/>
     </div>
 
   </div>
