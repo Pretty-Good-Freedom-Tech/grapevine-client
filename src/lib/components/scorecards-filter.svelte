@@ -1,8 +1,5 @@
 <script lang="ts">
 	import type { Scorecard } from "graperank-nodejs/src/types";
-	import { filterBigArray } from "graperank-nodejs/src/utils";
-	import ScorecardView from "./scorecard-view.svelte";
-	import ScorecardDataView from "./ScorecardData-view.svelte";
 	import type { Writable } from "svelte/store";
 	import { onMount } from "svelte";
 
