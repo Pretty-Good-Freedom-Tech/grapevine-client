@@ -20,7 +20,8 @@ onmessage = function(event){
   }
 }
 
-
+// use filterBigArray() to avoid stack overflow 
+// when calling filter on large arrays
 async function filterBigArray(bigarray, predicate, thisArg, max = 1000) {
   const filtered = []
   const slices = await sliceBigArray(bigarray, max)

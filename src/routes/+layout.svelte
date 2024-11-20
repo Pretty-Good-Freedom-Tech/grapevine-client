@@ -1,7 +1,7 @@
 <script>
-	import { loadNDK } from "$lib/stores/ndk.store";
+	// import { loadNDK } from "$lib/stores/ndk.store";
   import "../app.css";
-  loadNDK()
+  // loadNDK()
 </script>
 
 <div class="p-5 bg-neutral flex">

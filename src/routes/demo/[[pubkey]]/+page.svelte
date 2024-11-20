@@ -5,9 +5,10 @@
 	import ScorecardsAccordion from "$lib/components/scorecards-accordion.svelte";
 	import ScorecardsExport from "$lib/components/scorecards-export.svelte";
 	import ScorecardsFilter from "$lib/components/scorecards-filter.svelte";
-	import { ndk } from "$lib/stores/ndk.store";
+	import { loadNDK, ndk } from "$lib/stores/ndk.store";
+	import { DEFAULT_RELAYS } from "$lib/utils/const";
 	import { countScorecardsByScore, fetchScorecards, filterScorecardsByScore } from "$lib/utils/scorecards";
-  import NDK, { NDKNip07Signer , NDKUser, type NDKUserProfile} from "@nostr-dev-kit/ndk";
+  import NDK, { getRelayListForUsers, NDKNip07Signer , NDKUser, type NDKUserProfile} from "@nostr-dev-kit/ndk";
   import type { Scorecard } from "graperank-nodejs/src/types";
 	import { onMount } from "svelte";
 	import { writable } from "svelte/store";
@@ -31,14 +32,17 @@
   let calculationtime : number
   $: calculationtime = 0
   let demouser : NDKUser | undefined
-  $: demouser = $ndk.activeUser
+  $: demouser = undefined
   onMount(async ()=>{
   })
  
  async function loginDemo(){
-  $ndk.signer = new NDKNip07Signer()
-  demouser = await $ndk.signer.user()
-  profilepromise = demouser.fetchProfile()
+  await loadNDK({signer : new NDKNip07Signer()})
+
+  if($ndk.activeUser) {
+    profilepromise = $ndk.activeUser.fetchProfile()
+    demouser = $ndk.activeUser
+  }
   return 
  }
 
@@ -69,18 +73,19 @@
   {/if}
 
 
-  {#if demouser}
-  {#await profilepromise then}
+  {#if demouser && profilepromise}
+
+  {#await profilepromise then profile}
   <div class="flex items-center gap-3 p-5 mb-10 w-full">
     <div class="avatar w-32">
       <div class="rounded-full w-24 ring-2 ring-info ring-offset-4 ring-offset-purple-900">
-        <img src={demouser.profile?.image || defaultAvatarUrl} alt="avatar" />
+        <img src={profile?.image || defaultAvatarUrl} alt="avatar" />
       </div>
     </div> 
 
     <div class="grow h-24">
-      <div class="text-xl font-bold">{demouser.profile?.name || demouser.profile?.username}</div>
-      <div class="text-lg opacity-50">{demouser.profile?.nip05}</div>
+      <div class="text-xl font-bold">{profile?.name || profile?.username}</div>
+      <div class="text-lg opacity-50">{profile?.nip05}</div>
       <div class="text-md opacity-30">{demouser.npub.slice(0,24)}...</div>
     </div>
   </div>

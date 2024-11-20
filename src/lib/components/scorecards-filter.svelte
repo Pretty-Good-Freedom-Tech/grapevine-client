@@ -35,6 +35,8 @@
 
   onMount(()=>{filter()})
 
+  // use webworker to avoid browser crash 
+  // when calling filter() multiple times from UI
   async function filter(){
     filtering.set(true)
     if(filterworker) filterworker.terminate()

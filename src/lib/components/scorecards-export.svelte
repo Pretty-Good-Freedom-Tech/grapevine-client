@@ -41,7 +41,7 @@
     updateId()
   }
 
-  // returns a mapo of events indexed by id
+  // returns a map of events indexed by id
   async function fetchPublished() : Promise<void> {
       published = new Map()
       if($ndk.activeUser){
@@ -67,13 +67,16 @@
       }
   }
 
+  // FIXME publishing is not working
+  // throws : `NDKPublishError: Not enough relays received the event`
   async function publish(){
     if(!$ndk.activeUser) return
     let pubkey = $ndk.activeUser.pubkey
+    // compose new event
     const event = new NDKEvent($ndk,{
       pubkey,
       kind : input.asmutelist ? 30007 : 30000,
-      created_at : Date.now().valueOf(),    
+      created_at : new Date().getTime() / 1000,
       content : '',
       tags : [
         ['d', input.id],
@@ -81,7 +84,7 @@
         ['description',  input.description]
       ]
     })
-
+    // add a p tag for each scorecard (up to max) using big array function
     await forEachBigArray($scorecards.slice(0,maxpublishlength), (scorecard) => {
       event.tags.push([
         'p', // insert a new p tag
@@ -96,24 +99,27 @@
         context || ''
       ]) 
     })
-
-    event.id = event.getEventHash()
-
+    // 'technically' the user's published list of 'prefered relays' 
+    // will be fetched by NDK when calling event.publish()... 
+    // but we go ahead and fetch the list here to help with debuging :
     await getRelayListForUsers([pubkey], $ndk).then((relayMap)=>{
       let relayset : Set<NDKRelay> = new Set();
       let relayUrls = normalize(relayMap.get(pubkey)?.writeRelayUrls || [])
-      relayUrls.forEach((relayUrl,index) => {
-            const relay = $ndk.pool?.getRelay(relayUrl)
-            if (relay) {
-              relayset.add(relay) 
-              // relay.connect()
-            }
-            else relayUrls[index] = '' 
-        });
-      console.log('GrapeVine : demo export : publishing to user write relays : ', relayUrls)
+      relayUrls.forEach((relayurl,index)=> {
+        let relay = $ndk.pool?.getRelay(relayurl)
+        // DEBUG confirm each relay is connected
+        if (relay.connected) {
+          relayset.add(relay)
+          // DEBUG log connection info about each relay ... BEFORE publish attemmpt
+          console.log('GrapeVine : demo export : attempt publishing to relay : ', relay.url, relay.connected, relay.status, relay.connectionStats)
+        }
+      })
+      // call publish with relaySet AND store promise as a variable
+      // so that svelte HTML (bellow) can react when promise is fulfilled
       publishedto = event.publish(new NDKRelaySet(relayset, $ndk))
+      // this error will be output to console AFTER publish attempt
+      publishedto.catch((e) => console.log('GrapeVine : publishing failed : ', e))
     })
-
   }
 
 
@@ -213,7 +219,7 @@
 </label>
 <br>
 <label>
-  <button disabled class="btn btn-xl btn-primary text-xl" on:click={publish}>Publish</button>
+  <button class="btn btn-xl btn-primary text-xl" on:click={publish}>Publish</button>
 </label>
 
 {#if publishedto}
