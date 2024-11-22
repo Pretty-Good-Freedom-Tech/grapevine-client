@@ -35,6 +35,18 @@ export function npubDecode(npub:string){
   return nip19.decode(npub).data as Hexpubkey
 }
 
+export function validatePubkey(pubkey : string){
+  let pubkeyregex = /^[0-9a-fA-F]{64}$/
+  try{
+    if(!pubkeyregex.test(pubkey)) throw('')
+    npubEncode(pubkey)
+  }catch(e){
+    return false
+  }
+  return true
+}
+
+
 export function userHasNip05Domain(user:NDKUser, hasdomain = APP_DOMAIN){
 let {username, domain} = parseNip05(user.profile?.nip05)
 return domain == hasdomain ? true : false; 
