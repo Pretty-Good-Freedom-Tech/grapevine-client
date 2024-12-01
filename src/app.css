@@ -1,3 +1,87 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/**
+ * override tailwind
+*/
+.rangeSlider.range {
+  width: none;
+  cursor: pointer;
+  /* --range-shdw: var(--fallback-bc, oklch(var(--bc) / 1)); */
+  overflow: visible !important;
+}
+
+/**
+* Range Slider default size/colors
+*/
+.rangeSlider {
+font-size: 18px;
+--handleBg: var(--range-inactive);
+}
+
+.rangeSlider.focus { 
+--handleBg: var(--range); 
+}
+
+/**
+* Track / Bar
+*/
+.rangeSlider .rangeBar {
+height: 1.4em !important;
+top: .25em !important;
+translate:  0 -50%;
+}
+
+.rangeSlider.range .rangeBar {
+border-radius: 0;
+}
+
+.rangeSlider.range.min .rangeBar {
+border-radius: 100px 0 0 100px;
+}
+
+.rangeSlider.range.max .rangeBar {
+border-radius: 0 100px 100px 0;
+}
+
+/** 
+* Handles / Floats
+*/
+.rangeSlider .rangeNub,
+.rangeSlider.focus .rangeNub {
+background: white;
+border: 3px solid var(--handleBg);
+}
+
+.rangeSlider .rangeFloat {
+  top: 4.3em !important;
+  background: transparent !important;
+  opacity: 1 !important;
+}
+ 
+/**
+* Pips
+*/
+.rangeSlider .rangePips {
+z-index: 1;
+}
+
+.rangeSlider .pip {
+border-radius: 3px;
+background: var(--slider);
+translate: -1px -5px;
+}
+
+.rangeSlider .pip.selected,
+.rangeSlider .pip.in-range {
+width: 3px;
+background: var(--handleBg);
+translate: -1px -1px;
+}
+
+.rangeSlider .pip.in-range {
+width: 1px;
+height: 4px;
+background: hsla(0, 0%, 100%, 0.75);
+}
