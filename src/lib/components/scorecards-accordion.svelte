@@ -13,6 +13,8 @@
   let start : number = 0
   let end : number = 1
   let rerender = false
+  let openitem : string
+  $: openitem = ''
 
   const sortoptions : Map<string,(a: Scorecard, b: Scorecard) => number> = new Map([
     ['Highest Influence Score',
@@ -67,14 +69,14 @@
 
 {#key rerender}
   <VirtualList items={$scorecards} bind:start bind:end let:item height='480px'>
-    <div class="collapse collapse-arrow">
-        <input type="radio" name="scorecards-list" class="w-32 ml-[300px]" style="position:relative right:0px"/>
+    <div class="collapse collapse-arrow collapse-{openitem == item.subject ? 'open' : 'close'}">
+        <input type="radio" name="scorecards-list" class="w-32 ml-[300px]" style="position:relative right:0px;cursor:pointer" on:click={()=> openitem = openitem == item.subject ? '' : item.subject}/>
         <div class="collapse-title text-xl font-medium p-0">
           <ScorecardView scorecard={item} {profiles}/>
         </div>
         <div class="collapse-content">
           <ScorecardDataView scorecard={item}/>
         </div>
-      </div>    
+      </div>
   </VirtualList>
 {/key}
