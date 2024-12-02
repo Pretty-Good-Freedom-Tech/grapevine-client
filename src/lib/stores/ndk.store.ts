@@ -9,14 +9,15 @@ import {type Writable, writable } from "svelte/store";
 // get curent state of NDK instance ... including ndk.signer
 export const ndk: Writable<NDK> = writable();
 
-export async function loadNDK(params:NDKConstructorParams | boolean = false){
-  let connected : Boolean = await new Promise((resolve)=>{
+export async function loadNDK(params:NDKConstructorParams | boolean = false) : Promise<boolean>{
+  let connected : boolean = await new Promise((resolve)=>{
     ndk.update((ndk)=>{
       if(ndk && !params) return ndk
       if(typeof params == 'boolean') params = {}
       let newndk:NDK | undefined;
       let config:NDKConstructorParams = {...{
           explicitRelayUrls: DEFAULT_RELAYS,
+          // autoConnectUserRelays : false,
           debug: false
       }, ...params}
       newndk = new NDK(config);
@@ -35,6 +36,6 @@ export async function loadNDK(params:NDKConstructorParams | boolean = false){
   // ...and add it to the context for child components to access
 	// setContext('ndk', ndk);
 
-  return ndk
+  return connected
 }
 

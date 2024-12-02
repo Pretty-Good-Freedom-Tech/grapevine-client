@@ -37,11 +37,10 @@
   })
  
  async function loginDemo(){
-  await loadNDK({signer : new NDKNip07Signer()})
-
-  if($ndk.activeUser) {
-    profilepromise = $ndk.activeUser.fetchProfile()
-    demouser = $ndk.activeUser
+  let connected = await loadNDK({signer : new NDKNip07Signer()})
+  if(connected) {
+    demouser = await $ndk.signer?.user()
+    if(demouser) profilepromise = demouser.fetchProfile()
   }
   return 
  }
