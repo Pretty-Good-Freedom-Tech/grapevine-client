@@ -70,7 +70,7 @@
 {#key rerender}
   <VirtualList items={$scorecards} bind:start bind:end let:item height='480px'>
     <div class="collapse collapse-arrow collapse-{openitem == item.subject ? 'open' : 'close'}">
-        <input type="radio" name="scorecards-list" class="w-32 ml-[300px]" style="position:relative right:0px;cursor:pointer" on:click={()=> openitem = openitem == item.subject ? '' : item.subject}/>
+        <input type="radio" name="scorecards-list" class="w-32 h-32" style="cursor: pointer;position:absolute;right:0px" on:click={()=> openitem = openitem == item.subject ? '' : item.subject}/>
         <div class="collapse-title text-xl font-medium p-0">
           <ScorecardView scorecard={item} {profiles}/>
         </div>
