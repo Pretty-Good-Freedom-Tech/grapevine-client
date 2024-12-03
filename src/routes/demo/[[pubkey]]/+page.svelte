@@ -7,7 +7,7 @@
 	import ScorecardsFilter from "$lib/components/scorecards-filter.svelte";
 	import { loadNDK, ndk } from "$lib/stores/ndk.store";
 	import { DEFAULT_RELAYS } from "$lib/utils/const";
-	import { countScorecardsByScore, fetchScorecards, filterScorecardsByScore } from "$lib/utils/scorecards";
+	import { countScorecardsByScore, fetchScorecards, filterScorecardsByScore, type scorecardsummary } from "$lib/utils/scorecards";
   import NDK, { getRelayListForUsers, NDKNip07Signer , NDKUser, type NDKUserProfile} from "@nostr-dev-kit/ndk";
   import type { Scorecard } from "graperank-nodejs/src/types";
 	import { onMount } from "svelte";
@@ -33,6 +33,15 @@
   $: calculationtime = 0
   let demouser : NDKUser | undefined
   $: demouser = undefined
+  let summary : scorecardsummary
+  $: summary = []
+  let summarizefiltered = false
+  function summarize(){
+    summary = summarizefiltered 
+      ? countScorecardsByScore($filtered) 
+      : countScorecardsByScore(scorecards)
+  }
+
   onMount(async ()=>{
   })
  
@@ -53,18 +62,21 @@
     if(scorecardstorage){
       scorecards = scorecardstorage
       filtered.set(scorecards)
+      summarize()
       numcards = scorecards.length
       cardsMB = new TextEncoder().encode(JSON.stringify(scorecards)).length  / 1024 / 1024;
       calculationtime = (Date.now() - calculationtime) * .001
     }
   })
+
   return true
 }
 
 </script>
 
-<section class="p-5">
-  <div class="text-center"><span class="badge badge-primary badge-outline badge-lg p-4 mb-3">DEMO</span></div>
+<div class="text-center absolute top-0 right-0 m-3"><span class="badge badge-primary badge-outline badge-lg p-4 mb-3">DEMO</span></div>
+
+<section class="p-5 relative">
 
   {#if !demouser}
   <p class="text-lg p-5">Login with Nostr extention to launch the demo </p>
@@ -92,9 +104,9 @@
 
   <div class="flex justify-between">
     <h2 class="text-2xl ">GrapeVine Web of Trust</h2>
-    <!-- {#if scorecards?.length}
+    {#if scorecards?.length}
     <button class="btn btn-sm btn-info text-right" on:click={() => calculateScorecards(true)}>Recalculate</button>
-    {/if} -->
+    {/if}
   </div>
   <hr class="p-3">
 
@@ -120,9 +132,16 @@
     <div role="tabpanel" class="tab-content p-5 gap-2">
       <p class="text-xl">GrapeRank found {numcards || 0} people in your network.</p>
       <p class="text-sm opacity-50">The calculation took {Math.round(calculationtime)} seconds and produced {cardsMB.toPrecision(4)}MB of data.</p>
-    
+
+
       <div class="p-5 gap-3">
-        {#each countScorecardsByScore(scorecards) as score, index}
+        <div class="form-control">
+          <label class="label cursor-pointer">
+            <span class="label-text">Summary of <b class="{summarizefiltered ? 'text-primary' : ''}">{summarizefiltered ? 'Filtered' : 'All'} Results</b></span>
+            <input type="checkbox" class="toggle" bind:checked={summarizefiltered} on:change={summarize} />
+          </label>
+        </div>
+        {#each summary as score, index}
         <div>
           <progress class="progress progress-primary w-full" value={(score.count / numcards ) * 100} max={25}></progress>
           <p class="text-sm opacity-80">{score.count} people scored {score.min.toPrecision(1)} - {score.max.toPrecision(1)}</p>
@@ -131,14 +150,14 @@
       </div>
     </div>
 
-    <input type="radio" name="grapevine" role="tab" class="tab" aria-label="Results" />
-    <div role="tabpanel" class="tab-content gap-2">
-      {#if !$filtering }<ScorecardsAccordion scorecards={filtered} />{/if}
-    </div>
-
     <input type="radio" name="grapevine" role="tab" class="tab" aria-label="Filter" />
     <div role="tabpanel" class="tab-content p-5 gap-2">
         <ScorecardsFilter {scorecards} {filtered} {filtering}/>
+    </div>
+
+    <input type="radio" name="grapevine" role="tab" class="tab" aria-label="Results" />
+    <div role="tabpanel" class="tab-content gap-2">
+      {#if !$filtering }<ScorecardsAccordion scorecards={filtered} />{/if}
     </div>
 
     <input type="radio" name="grapevine" role="tab" class="tab" aria-label="Export" />

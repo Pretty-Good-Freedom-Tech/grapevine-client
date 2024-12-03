@@ -19,9 +19,9 @@ export async function fetchScorecards(pubkey : string, context? : string, recalc
     return scorecards
 }
 
-
-export function countScorecardsByScore(scorecards : Scorecard[], increment = .1, max = 1) : {min:number, max:number, count:number}[] {
-  const count : {min:number, max:number, count:number}[] = []
+export type scorecardsummary = {min:number, max:number, count:number}[]
+export function countScorecardsByScore(scorecards : Scorecard[], increment = .1, max = 1) : scorecardsummary {
+  const count : scorecardsummary = []
   let min = max
   while(min > 0){
     min = min - increment

@@ -205,14 +205,14 @@
 
 
 
-<h2 class="text-xl py-3">Publish your list to Nostr.</h2>
-<p>Adust for filters and sorting (in the other tabs) to configure your custom list for export. Publish as a Nostr (NIP 51) list bellow. Come back here and re-pubblish the same list (with updated results) any time youi like.</p>
+<h2 class="text-xl py-3">Publish your filtered results to Nostr.</h2>
+<p>Configure your Nostr list for export by adusting the filters and sorting in the other tabs. Publish your results as a Nostr (NIP 51) list wiith the settings bellow. Come back here and re-pubblish the same list (with updated results) any time youi like.</p>
 <br>
-<h3 class="text-lg pb-3">Use your published lists as : </h3>
+<h3 class="text-lg pb-3">Use your published list : </h3>
 <ul class="steps steps-vertical">
-  <li class="step"  data-content="✓">a custom feed or mute list in your favorite client.</li>
-  <li class="step"  data-content="✓">a whitelist or blacklist for your personal relay.</li>
-  <li class="step"  data-content="✓">a listr list with MANY other uses on Nostr.</li>
+  <li class="step"  data-content="✓">as a custom feed in your favorite client.</li>
+  <li class="step"  data-content="✓">as a whitelist for your personal WoT relay.</li>
+  <li class="step"  data-content="✓">as a listr list with MANY other uses on Nostr.</li>
 </ul>
 
 <hr class="my-5">
