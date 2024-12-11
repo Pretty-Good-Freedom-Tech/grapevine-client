@@ -1,5 +1,5 @@
-import {DEMO_CONTEXT, GrapeRank} from "graperank-nodejs/src"
-import type { ApiDataTypes, EngineRequest, Scorecard, ScorecardsDataStorage } from "graperank-nodejs/src/types"
+import {GrapeRank} from "graperank-nodejs/src"
+import { DEMO_CONTEXT, type ApiDataTypes, type EngineRequest, type Scorecard, type ScorecardsRecord } from "graperank-nodejs/src/types"
 import { json, type RequestHandler } from "@sveltejs/kit";
 
 /**
@@ -31,9 +31,9 @@ export const GET: RequestHandler = async (request) => {
   const starttime = Date.now()
   console.log("GrapeVine : calling GrapeRank.get()")
   try{
-    graperankdata = await graperank.get() as ScorecardsDataStorage
-    if(graperankdata && Object.hasOwn(graperankdata, 'length')) {
-      console.log("GrapeVine : GrapeRank complete with ", graperankdata.length || 0, " records")
+    graperankdata = await graperank.get() as ScorecardsRecord
+    if(graperankdata) {
+      console.log("GrapeVine : GrapeRank complete with ", Object.keys(graperankdata).length || 0, " records")
     }else{
       throw("GrapeVine : no results")
     }

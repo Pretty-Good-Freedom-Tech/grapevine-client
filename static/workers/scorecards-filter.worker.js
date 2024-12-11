@@ -9,14 +9,14 @@ onmessage = function(event){
         (input.showzeroscores || (!input.showzeroscores && scorecard.score)) &&
         (!input.score[0] || ((input.score[0] /100) <= (scorecard.score || 0))) &&
         (!input.score[1] || ((input.score[1] / 100) >= (scorecard.score || 0))) &&
-        (!input.dos[0] || (input.dos[0] <= (scorecard.input?.dos || 0))) &&
-        (!input.dos[1] || (input.dos[1] >= (scorecard.input?.dos || 0))) &&
-        (!input.followedby[0] || input.followedby[0] <= (scorecard.input?.count['nostr-follows'] || 0)) &&
-        (!input.followedby[1] || input.followedby[1] >= (scorecard.input?.count['nostr-follows'] || 0)) &&
-        (!input.mutedby[0] || input.mutedby[0] <= (scorecard.input?.count['nostr-mutes'] || 0)) &&
-        (!input.mutedby[1] || input.mutedby[1] >= (scorecard.input?.count['nostr-mutes'] || 0)) &&
-        (!input.reportedby[0] || input.reportedby[0] <= (scorecard.input?.count['nostr-reports'] || 0)) &&
-        (!input.reportedby[1] || input.reportedby[1] >= (scorecard.input?.count['nostr-reports'] || 0))
+        (!input.dos[0] || (input.dos[0] <= (scorecard.meta['nostr-follows']?.dos || 0))) &&
+        (!input.dos[1] || (input.dos[1] >= (scorecard.meta['nostr-follows']?.dos || 0))) &&
+        (!input.followedby[0] || input.followedby[0] <= (scorecard.meta['nostr-follows']?.numRatings || 0)) &&
+        (!input.followedby[1] || input.followedby[1] >= (scorecard.meta['nostr-follows']?.numRatings || 0)) &&
+        (!input.mutedby[0] || input.mutedby[0] <= (scorecard.meta['nostr-mutes']?.numRatings || 0)) &&
+        (!input.mutedby[1] || input.mutedby[1] >= (scorecard.meta['nostr-mutes']?.numRatings || 0)) &&
+        (!input.reportedby[0] || input.reportedby[0] <= (scorecard.meta['nostr-reports']?.numRatings || 0)) &&
+        (!input.reportedby[1] || input.reportedby[1] >= (scorecard.meta['nostr-reports']?.numRatings || 0))
     }).then((filtered)=>{
       postMessage(filtered)
     })

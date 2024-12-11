@@ -1,5 +1,20 @@
-import type { Scorecard, ScorecardsDataStorage } from "graperank-nodejs/src/types";
-const DEMO_CONTEXT = 'grapevine-web-of-trust-demo'
+import { DEMO_CONTEXT, type Scorecard, type ScorecardsRecord, type Worldview, type WorldviewData, type WorldviewKeys } from "graperank-nodejs/src/types";
+
+
+export async function fetchWorldview(pubkey : string, context? : string) : Promise<Worldview | undefined>{
+  console.log('grapevine getScorecards() params : ',pubkey,context)
+  context = context || DEMO_CONTEXT
+  let worldview : Worldview | undefined
+  await fetch('/api/get/worldview/'+pubkey+'/'+context )
+    .then(async r => {
+      console.log('grapevine fetchWorldview() : fetched from api')
+      let { keys, data } : {keys : WorldviewKeys, data : WorldviewData} = await r.json()
+      worldview = {...keys, ...data, context : keys.context || context}
+    }).catch((e) => {
+      console.log('GrapeVine : fetchWorldview() : fetch from api failed : ',e)
+    })
+    return worldview
+}
 
 export async function fetchScorecards(pubkey : string, context? : string, recalculate? : boolean) : Promise<Scorecard[] | undefined>{
   console.log('grapevine getScorecards() params : ',pubkey,context)
@@ -9,10 +24,10 @@ export async function fetchScorecards(pubkey : string, context? : string, recalc
   await fetch('/api/get/scorecards/'+pubkey+'/'+context+'?'+query )
     .then(async r => {
       console.log('grapevine getScorecards() : fetched from api')
-      let data = await r.json() as ScorecardsDataStorage
-      if(data) data.forEach((entry)=>{
-        scorecards.push({  subject : entry[0],  ...entry[1]  })
-      })
+      let data = await r.json() as ScorecardsRecord
+      if(data) for(let userid in data) {
+        scorecards.push({  subject : userid,  ...data[userid]  })
+      }
     }).catch((e) => {
       console.log('GrapeVine : getScorecards() : fetch from api failed : ',e)
     })
@@ -47,3 +62,4 @@ export function filterScorecardsByScore(scorecards : Scorecard[], min : number, 
   })
   return slice ? filtered.slice(...slice) : filtered
 }
+

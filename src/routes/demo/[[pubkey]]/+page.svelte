@@ -1,30 +1,29 @@
 
 <script lang="ts">
-  // import { DEMO_CONTEXT } from "graperank-nodejs/src";
-  import ScorecardView from "$lib/components/scorecard-view.svelte";
 	import ScorecardsAccordion from "$lib/components/scorecards-accordion.svelte";
 	import ScorecardsExport from "$lib/components/scorecards-export.svelte";
 	import ScorecardsFilter from "$lib/components/scorecards-filter.svelte";
 	import { loadNDK, ndk } from "$lib/stores/ndk.store";
-	import { DEFAULT_RELAYS } from "$lib/utils/const";
-	import { countScorecardsByScore, fetchScorecards, filterScorecardsByScore, type scorecardsummary } from "$lib/utils/scorecards";
-  import NDK, { getRelayListForUsers, NDKNip07Signer , NDKUser, type NDKUserProfile} from "@nostr-dev-kit/ndk";
-  import type { Scorecard } from "graperank-nodejs/src/types";
+	import { countScorecardsByScore, fetchScorecards, fetchWorldview, type scorecardsummary } from "$lib/utils/scorecards";
+  import NDK, {NDKNip07Signer , NDKUser, type NDKUserProfile} from "@nostr-dev-kit/ndk";
+  import type { Scorecard, Worldview } from "graperank-nodejs/src/types";
 	import { onMount } from "svelte";
 	import { writable } from "svelte/store";
 
-	// export let data;
-  const DEMO_CONTEXT = 'grapevine-web-of-trust-demo'
-
+  const DEMO_CONTEXT = "grapevine-web-of-trust-demo"
   const defaultAvatarUrl = "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
 
   let scorecardspromise : Promise<Scorecard[] | undefined>
   let profilepromise : Promise<NDKUserProfile | null>
+  let worldviewpromise : Promise<Worldview | undefined>
+  let worldview : Worldview | undefined
   let scorecards : Scorecard[]
   let filtered = writable<Scorecard[]>()
   let filtering = writable<boolean>()
+
   // filtered.subscribe(()=>{ rerender = !rerender })
 
+  let recalculate : boolean | undefined
   let numcards : number
   $: numcards = 0
   let cardsMB : number
@@ -43,21 +42,30 @@
   }
 
   onMount(async ()=>{
+    loginDemo()
   })
  
  async function loginDemo(){
   let connected = await loadNDK({signer : new NDKNip07Signer()})
   if(connected) {
     demouser = await $ndk.signer?.user()
-    if(demouser) profilepromise = demouser.fetchProfile()
+    if(demouser) {
+      profilepromise = demouser.fetchProfile()
+      worldviewpromise = fetchWorldview(demouser.pubkey)
+      worldviewpromise.then((result)=> {
+        worldview = result
+        console.log('fetched worldview : ',result)
+      })
+    }
   }
   return 
  }
 
- async function calculateScorecards(recalculate? : boolean){
+ async function calculateScorecards(rc? : boolean){
+  recalculate = rc 
   if(!demouser) return false
   calculationtime = Date.now()
-  scorecardspromise = fetchScorecards(demouser.pubkey, DEMO_CONTEXT, recalculate)
+  scorecardspromise = fetchScorecards(demouser.pubkey, undefined, recalculate)
   scorecardspromise.then((scorecardstorage)=>{
     if(scorecardstorage){
       scorecards = scorecardstorage
@@ -70,6 +78,18 @@
   })
 
   return true
+}
+
+function latestCalculationTime(worldview : Worldview){
+  if(!worldview.grapevines?.length) return
+  let timestamp = worldview.grapevines[0].timestamp
+  let diference = Date.now() - timestamp
+  let daysago = diference /1000 /60 /60 /24
+  return daysago > 1 ? Math.round(daysago) + " days ago" : daysago == 1 ? "yesterday" : "earlier today"
+  // let datetime = new Date(worldview.grapevines[0].timestamp)
+  // if(isNaN(datetime.valueOf())) 
+  //   return worldview.grapevines[0].timestamp
+  // return datetime.toString()
 }
 
 </script>
@@ -110,18 +130,42 @@
   </div>
   <hr class="p-3">
 
-  
+
   {#if !scorecardspromise}
-  Run the Calculation to see your network ... <br><br>
-  <button class="btn btn-info text-xl" on:click={() => calculateScorecards()}>Calculate My Grapevine Network</button>
+  {#await worldviewpromise}
+    Fetching calculations ...
+  {:then}
+    {#if worldview && worldview.grapevines?.length}
+    Your Grapevine was last calculated {latestCalculationTime(worldview)}.
+    <div class="join">
+      <button class="btn btn-primary text-xl join-item" on:click={() => calculateScorecards()}>Retrieve My Grapevine</button>
+      <button class="btn btn-info text-xl join-item" on:click={() => calculateScorecards(true)}>Recalculate</button>
+    </div>
+    {/if}
+
+    {#if !worldview}
+    Run the Calculation to see your network ... <br><br>
+    <button class="btn btn-info text-xl" on:click={() => calculateScorecards()}>Calculate My Grapevine Network</button>
+    {/if} 
+
+  {/await}
   {/if}
+
 
   {#if scorecardspromise}
   {#await scorecardspromise}
+  {#if worldview?.grapevines?.length && !recalculate}
   <p>
-    Calculating GrapeRank Scores for your network <br>
+    Retrieving your calculated Grapevine 
+    <span class="loading loading-dots loading-sm"></span>
+  </p>
+  {/if}
+  {#if !worldview?.grapevines?.length}
+  <p>
+    Calculating Grapevine Scores for your network <br>
     (This may take a minute <span class="loading loading-dots loading-sm"></span>)
   </p>
+  {/if}
 
   {:then}
   {#if scorecards}
@@ -130,7 +174,7 @@
     <input type="radio" name="grapevine" role="tab" class="tab" aria-label="Summary" checked/>
 
     <div role="tabpanel" class="tab-content p-5 gap-2">
-      <p class="text-xl">GrapeRank found {numcards || 0} people in your network.</p>
+      <p class="text-xl">Grapevine found {numcards || 0} people in your network.</p>
       <p class="text-sm opacity-50">The calculation took {Math.round(calculationtime)} seconds and produced {cardsMB.toPrecision(4)}MB of data.</p>
 
 

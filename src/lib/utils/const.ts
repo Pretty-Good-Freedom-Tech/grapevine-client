@@ -10,8 +10,6 @@ export const DEFAULT_RELAYS = [
 
 export const DEFAULT_AVATAR = "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
 
-export const DEMO_CONTEXT = "grapevine-web-of-trust-demo"
-export const DEFAULT_CONTEXT = "grapevine-web-of-trust"
 
 export const NPUB = 'npub'
 export const PUBKEY = 'pubkey'

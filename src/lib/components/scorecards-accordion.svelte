@@ -25,25 +25,33 @@
     ],
     ['Most Followed By',
       (a: Scorecard, b: Scorecard) => 
-        (b.input?.count ? b.input.count['nostr-follows'] || 0 : 0) -
-        (a.input?.count ? a.input.count['nostr-follows'] || 0 : 0)
+        (b.meta ? b.meta['nostr-follows']?.numRatings || 0 : 0) -
+        (a.meta ? a.meta['nostr-follows']?.numRatings || 0 : 0)
     ],
     ['Least Followed By',
       (a: Scorecard, b: Scorecard) => 
-        (a.input?.count ? a.input.count['nostr-follows'] || 0 : 0) -
-        (b.input?.count ? b.input.count['nostr-follows'] || 0 : 0)
+      (a.meta ? a.meta['nostr-follows']?.numRatings || 0 : 0) -
+      (b.meta ? b.meta['nostr-follows']?.numRatings || 0 : 0)
     ],
     ['Closest Degree of Separation',
-      (a: Scorecard, b: Scorecard)=> (a.input?.dos  || 0)  - (b.input?.dos || 0)
+      (a: Scorecard, b: Scorecard)=> 
+      (a.meta ? a.meta['nostr-follows']?.dos || 0 : 0)  - 
+      (b.meta ? b.meta['nostr-follows']?.dos || 0 : 0)
     ],
     ['Farthest Degree of Separation',
-      (a: Scorecard, b: Scorecard)=> (b.input?.dos || 0)  - (a.input?.dos  || 0)
+      (a: Scorecard, b: Scorecard)=> 
+      (b.meta ? b.meta['nostr-follows']?.dos || 0 : 0) - 
+      (a.meta ? a.meta['nostr-follows']?.dos || 0 : 0)
     ],
     ['Highest Weight of Follows',
-      (a: Scorecard, b: Scorecard)=> (b.input?.weights || 0)  - (a.input?.weights  || 0)
+      (a: Scorecard, b: Scorecard)=> 
+      (b.meta ? b.meta['nostr-follows']?.weighted || 0 : 0)  - 
+      (a.meta ? a.meta['nostr-follows']?.weighted || 0 : 0)
     ],
     ['Lowest Weight of Follows',
-      (a: Scorecard, b: Scorecard)=> (a.input?.weights  || 0)  - (b.input?.weights || 0)
+      (a: Scorecard, b: Scorecard)=> 
+      (a.meta ? a.meta['nostr-follows']?.weighted || 0 : 0) - 
+      (b.meta ? b.meta['nostr-follows']?.weighted || 0 : 0)
     ],
   ])
   let sortby : string = sortoptions.keys().next().value as string
